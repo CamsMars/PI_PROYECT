@@ -15,5 +15,6 @@ class User(models.Model):
     Email = models.CharField(unique=True,max_length=25)
     Tpassw = models.CharField(unique=True,max_length=500)
     IA_Data = models.CharField(unique=True, max_length=700)
+    Gustos = models.CharField(unique=False,null=True,max_length=700)
     User_BirthDate = models.DateField()
     UserCreateDate = models.DateTimeField()
