@@ -18,3 +18,4 @@ class User(models.Model):
     Gustos = models.CharField(unique=False,null=True,max_length=700)
     User_BirthDate = models.DateField()
     UserCreateDate = models.DateTimeField()
+

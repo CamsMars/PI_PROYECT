@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist Manager</title>
+</head>
+<body>
+<h1>Spotify Playlist Manager</h1>
+
+<!-- Button to authenticate with Spotify -->
+<h2>Authenticate with Spotify</h2>
+<button type="button" onclick="authenticateSpotify()">Authenticate</button>
+
+<!-- Form to create a new playlist -->
+<h2>Create Playlist</h2>
+<form id="create-playlist-form">
+    <label for="playlist-name">Playlist Name:</label>
+    <input type="text" id="playlist-name" name="name" required>
+    <br>
+    <label for="playlist-description">Playlist Description:</label>
+    <input type="text" id="playlist-description" name="description" required>
+    <br>
+    <button type="button" onclick="createPlaylist()">Create Playlist</button>
+</form>
+
+<!-- Form to modify an existing playlist -->
+<h2>Modify Playlist</h2>
+<form id="modify-playlist-form">
+    <label for="playlist-id">Playlist ID:</label>
+    <input type="text" id="playlist-id" name="playlist_id" required>
+    <br>
+    <label for="new-playlist-name">New Playlist Name:</label>
+    <input type="text" id="new-playlist-name" name="name" required>
+    <br>
+    <label for="new-playlist-description">New Playlist Description:</label>
+    <input type="text" id="new-playlist-description" name="description" required>
+    <br>
+    <button type="button" onclick="modifyPlaylist()">Modify Playlist</button>
+</form>
+
+<!-- Button to list all playlists -->
+<h2>List Playlists</h2>
+<button type="button" onclick="listPlaylists()">List Playlists</button>
+<div id="playlists"></div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function authenticateSpotify() {
+        window.location.href = '/spotify/login';
+    }
+
+    async function createPlaylist() {
+        const name = document.getElementById('playlist-name').value;
+        const description = document.getElementById('playlist-description').value;
+        const csrftoken = getCookie('csrftoken');
+
+        try {
+            const response = await fetch('/spotify/create-playlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ name, description })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert('Playlist created: ' + JSON.stringify(data));
+        } catch (error) {
+            console.error('Error creating playlist:', error);
+            alert('Failed to create playlist. Please try again.');
+        }
+    }
+
+    async function modifyPlaylist() {
+        const playlistId = document.getElementById('playlist-id').value;
+        const name = document.getElementById('new-playlist-name').value;
+        const description = document.getElementById('new-playlist-description').value;
+
+        const response = await fetch(`/spotify/modify-playlist/${playlistId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, description })
+        });
+
+        const data = await response.json();
+        alert('Playlist modified: ' + JSON.stringify(data));
+    }
+
+    async function listPlaylists() {
+        const response = await fetch('/spotify/list-playlists', {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+        const playlistsDiv = document.getElementById('playlists');
+        playlistsDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+</script>
+</body>
+</html>

@@ -42,23 +42,29 @@ def is_spotify_authenticated(session_id):
     return False
 
 def refresh_spotify_token(session_id):
-    refresh_token = check_tokens(session_id).refresh_token
+    tokens = get_user_tokens(session_id)
+    refresh_token = tokens.refresh_token
 
-    response = post('https://accounts.spotify.com/api/token', data={
-        'grant_type' : 'refresh_token',
-        'refresh_token' : refresh_token,
-        'client_id' : CLIENT_ID,
-        'client_secret' : CLIENT_SECRET
-    })
-
-    access_token = response.get('access_token')
-    expires_in = response.get('expires_in')
-    token_type = response.get('token_type')
-
-    update_or_create_tokens(
-        session_id,
-        access_token,
-        refresh_token,
-        expires_in,
-        token_type
+    response = post(
+        'https://accounts.spotify.com/api/token',
+        data={
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token,
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET
+        }
     )
+
+    response_data = response.json()  # Convert response to dictionary
+
+    access_token = response_data.get('access_token')
+    token_type = response_data.get('token_type')
+    expires_in = response_data.get('expires_in')
+
+    update_or_create_tokens(session_id, access_token, refresh_token, expires_in, token_type)
+
+def get_user_tokens(session_id):
+    tokens = Token.objects.filter(user=session_id)
+    if tokens.exists():
+        return tokens.first()
+    return None
