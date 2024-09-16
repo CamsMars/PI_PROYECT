@@ -16,10 +16,6 @@ Este repositorio contiene una página web con integraciones de IA y Spotyfy API
 
 - [Uso](#uso)
 
-- [Estructura del Proyecto](#estructura-del-proyecto)
-
-- [Contribuir](#contribuir)
-
 - [Licencia](#licencia)
 
 
