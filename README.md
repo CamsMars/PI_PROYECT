@@ -44,7 +44,7 @@ Asegúrate de tener instalados los siguientes requisitos antes de continuar con 
 
 - Django
 
-- Otros paquetes que están especificados en el archivo [requirements.txt](https://github.com/CamsMars/PI_PROYECT/blob/658996757dcec066805a6d46c2f2522af779eb6c/MIUW/requirements.txt)
+- Otros paquetes que están especificados en el archivo [requirements](https://github.com/CamsMars/PI_PROYECT/blob/658996757dcec066805a6d46c2f2522af779eb6c/MIUW/requirements.txt)
 
 
 
