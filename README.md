@@ -148,19 +148,6 @@ Sigue estos pasos para clonar e instalar el proyecto en tu máquina local.
 
     ```
 
-
-
-## Estructura del Proyecto
-repo/
-│
-├── manage.py # Script principal de Django 
-├── requirements.txt # Dependencias del proyecto 
-├── app/ # Aplicaciones Django (Chatbot, Música, etc.) 
-│ ├── models.py # Modelos de base de datos 
-│ ├── views.py # Lógica de las vistas 
-│ └── urls.py # Rutas del proyecto 
-└── templates/ # Archivos HTML de la interfaz de usuario
-
 ## Licencia
 
 Este proyecto está bajo la Licencia EAFIT?.
