@@ -96,17 +96,30 @@
         const name = document.getElementById('new-playlist-name').value;
         const description = document.getElementById('new-playlist-description').value;
 
-        const response = await fetch(`/spotify/modify-playlist/${playlistId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, description })
-        });
+        const csrftoken = getCookie('csrftoken');  // Add this line if CSRF token is needed
 
-        const data = await response.json();
-        alert('Playlist modified: ' + JSON.stringify(data));
+        try {
+            const response = await fetch(`/spotify/modify-playlist/${playlistId}`, {
+                method: 'PUT',  // Change from POST to PUT
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ name, description })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert('Playlist modified: ' + JSON.stringify(data));
+        } catch (error) {
+            console.error('Error modifying playlist:', error);
+            alert('Failed to modify playlist. Please try again.');
+        }
     }
+
 
     async function listPlaylists() {
         const response = await fetch('/spotify/list-playlists', {

@@ -4,35 +4,54 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIUW/Profile</title>
-    <link rel="stylesheet" href="../../MIUW/static/MIUWApp/templates/bootstrap.min.css">
-    <link rel="stylesheet" href="../../MIUW/static/MIUWApp/templates/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap" rel="stylesheet">
+    <title>MIUW - Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0D0D0D; /* Mismo color de fondo que el chat */
+            font-family: 'Poppins', sans-serif;
+            color: #FFFFFF; /* Color de texto */
+        }
+        nav ul li a:hover {
+            background-color: #dab1de9a; /* Color al pasar el ratón por encima */
+        }
+        .btn-custom {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block; /* Asegura que el botón esté en línea pero en su propio bloque */
+            transition: background-color 0.3s;
+            background-position: center; /* Establece la posición del fondo */
+        }
+        .btn-custom:hover {
+            background-color: #004494; /* Cambia el color al pasar el mouse */
+        }
+    </style>
 </head>
 <body>
-<div class="container-fluid bg-body-tertiary">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">MENU</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav md-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="index.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="chattest.html">Chat</a>
+                        <a class="nav-link active" href="chat.html">Chat</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="profile.html">Profile</a>
                     </li>
-                    <!-- Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            More
-                        </a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">More</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Log in</a></li>
                             <li><a class="dropdown-item" href="#">Sign up</a></li>
@@ -42,38 +61,55 @@
             </div>
         </div>
     </nav>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<div class="container my-5">
-    <h1 style="text-align: center; margin: 100px; color:#14011bf3">Personal Profile</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="profile-item mb-4 p-3 bg-light border rounded">
-                <h5 class="mb-2">Name:</h5>
-                <p>Camila</p>
+    <div class="container">
+        <header>
+            <h1>Profile</h1>
+        </header>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter your name" required>
             </div>
-            <div class="profile-item mb-4 p-3 bg-light border rounded">
-                <h5 class="mb-2">Last Name:</h5>
-                <p>Martinez</p>
+            <div class="form-group">
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" placeholder="Enter your last name" required>
             </div>
-            <div class="profile-item mb-4 p-3 bg-light border rounded">
-                <h5 class="mb-2">Email:</h5>
-                <p>cmartinezm@eafit.edu.com</p>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="profile-item mb-4 p-3 bg-light border rounded">
-                <h5 class="mb-2">Favorites:</h5>
-                <p>Artists, Playlist, Genres ...</p>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Choose a username" required>
             </div>
-            <div class="profile-item mb-4 p-3 bg-light border rounded">
-                <h5 class="mb-2">Password:</h5>
-                <p>********</p>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label>Test Music Preferences</label>
+                <div class="preferences">
+                    <span class="tag">Rock</span>
+                    <span class="tag">Pop</span>
+                    <span class="tag">Jazz</span>
+                    <span class="tag">Classical</span>
+                    <span class="tag">Electronic</span>
+                    <span class="tag">Hip Hop</span>
+                    <span class="tag">Reggae</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="favorites">Favorites Artists</label>
+                <input type="text" id="favorites" placeholder="Enter favorite artists" required>
+            </div>
+            <div class="form-group">
+                <label for="feelings">Feelings / Music</label>
+                <input type="text" id="feelings" placeholder="Your feelings about music" required>
+            </div>
+            <div class="button"> <!-- Cambia 'botton' a 'button' -->
+                <button type="submit" class="btn-custom">Save Changes</button>
+            </div>            
+        </form>
     </div>
-</div>
-
 </body>
 </html>
