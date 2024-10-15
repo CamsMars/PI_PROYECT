@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from MIUWApp import views as MIUWApp_views
 from Api import views as Api_views
+from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +33,8 @@ urlpatterns = [
     path('spotify/create-playlist', Api_views.CreatePlaylist.as_view(), name='create-playlist'),
     path('spotify/modify-playlist/<str:playlist_id>', Api_views.ModifyPlaylist.as_view(), name='modify-playlist'),
     path('spotify/list-playlists', Api_views.ListPlaylists.as_view(), name='list-playlists'),
+    path('signup/', MIUWApp_views.menu, name='menu'),
+    path('signupaccount/', MIUWApp_views.signupaccount, name='signupaccount'),
+    path('logout/', MIUWApp_views.LogOUT,name='LogOut'),
+    path('login/', MIUWApp_views.LogIN, name='LogIn'),
 ]
