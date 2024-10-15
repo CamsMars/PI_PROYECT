@@ -49,4 +49,5 @@ def LogIN(request):
         else :
             login(request, user)
             return redirect('home')
+        
 # Create your views here.
