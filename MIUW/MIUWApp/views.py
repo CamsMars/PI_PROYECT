@@ -6,6 +6,7 @@ from django.contrib.auth. forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect
 from django.db import IntegrityError
+from Api.models import Usuario
 
 
 def home(request):
@@ -25,9 +26,9 @@ def signupaccount(request):
         return render(request, 'signupaccount.html',{'form':UserCreationForm})
     else:
         if request.POST['password1']==request.POST['password2']:
-            try:
+            try: 
+                user =User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 user.save()
-                user =user.objects.create_user(request.POST['username'], password=request.POST['password'])
                 login(request, user)
                 return redirect('home')
             except IntegrityError:
@@ -49,5 +50,8 @@ def LogIN(request):
         else :
             login(request, user)
             return redirect('home')
+        
+def perfil(request):
+    return render(request, 'profile.html')
         
 # Create your views here.
