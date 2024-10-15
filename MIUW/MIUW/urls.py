@@ -32,4 +32,8 @@ urlpatterns = [
     path('spotify/create-playlist', Api_views.CreatePlaylist.as_view(), name='create-playlist'),
     path('spotify/modify-playlist/<str:playlist_id>', Api_views.ModifyPlaylist.as_view(), name='modify-playlist'),
     path('spotify/list-playlists', Api_views.ListPlaylists.as_view(), name='list-playlists'),
+    path('spotify/search-song/', Api_views.SearchSong.as_view(), name='search-song'),
+    path('spotify/add-song-to-playlist/<str:playlist_id>/', Api_views.AddSongToPlaylist.as_view(), name='add-song-to-playlist'),
+    path('spotify/get-access-token', Api_views.get_access_token, name='get_access_token'),
+    path('spotify/play-track', Api_views.play_track, name='play_track'),
 ]

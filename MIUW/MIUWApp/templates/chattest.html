@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Playlist Manager</title>
@@ -11,6 +12,17 @@
 <!-- Button to authenticate with Spotify -->
 <h2>Authenticate with Spotify</h2>
 <button type="button" onclick="authenticateSpotify()">Authenticate</button>
+
+<div id="spotify-player">
+    <h2>Spotify Player</h2>
+    <button onclick="playerTrack()">Play</button>
+    <button onclick="pauseTrack()">Pause</button>
+    <button onclick="skipTrack()">Next</button>
+    <div id="track-info">
+        <p id="track-name"></p>
+        <p id="track-artist"></p>
+    </div>
+</div>
 
 <!-- Form to create a new playlist -->
 <h2>Create Playlist</h2>
@@ -44,7 +56,30 @@
 <button type="button" onclick="listPlaylists()">List Playlists</button>
 <div id="playlists"></div>
 
+<!-- Search for a song -->
+<h2>Search for a Song</h2>
+<form id="search-song-form">
+    <label for="song-query">Song Name:</label>
+    <input type="text" id="song-query" name="song-query" required>
+    <br>
+    <button type="button" onclick="searchSong()">Search</button>
+</form>
+<div id="search-results"></div>
+
+<!-- Form to add a song to a playlist -->
+<h2>Add Song to Playlist</h2>
+<form id="add-song-form">
+    <label for="playlist-id-add">Playlist ID:</label>
+    <input type="text" id="playlist-id-add" name="playlist-id" required>
+    <br>
+    <label for="song-id-add">Song ID:</label>
+    <input type="text" id="song-id-add" name="song-id" required>
+    <br>
+    <button type="button" onclick="addToPlaylist()">Add Song to Playlist</button>
+</form>
+
 <script>
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -122,13 +157,227 @@
 
 
     async function listPlaylists() {
-        const response = await fetch('/spotify/list-playlists', {
-            method: 'GET'
-        });
+        try {
+            const response = await fetch('/spotify/list-playlists', {
+                method: 'GET'
+            });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const playlistsDiv = document.getElementById('playlists');
+
+            // Clear previous data
+            playlistsDiv.innerHTML = '';
+
+            // Check if there are playlists
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(playlist => {
+                    // Create elements for each piece of information
+                    const playlistContainer = document.createElement('div');
+                    playlistContainer.classList.add('playlist');
+
+                    const name = document.createElement('h3');
+                    name.textContent = `Name: ${playlist.name}`;
+
+                    const description = document.createElement('p');
+                    description.textContent = `Description: ${playlist.description || 'No description'}`;
+
+                    const url = document.createElement('a');
+                    url.href = playlist.external_urls.spotify;
+                    url.target = '_blank';
+                    url.textContent = 'Open Playlist';
+
+                    const id = document.createElement('p');
+                    id.textContent = `Playlist ID: ${playlist.id}`;
+
+                    // Append the elements to the container
+                    playlistContainer.appendChild(name);
+                    playlistContainer.appendChild(description);
+                    playlistContainer.appendChild(url);
+                    playlistContainer.appendChild(id);
+
+                    // Append the container to the playlists div
+                    playlistsDiv.appendChild(playlistContainer);
+                });
+            } else {
+                playlistsDiv.innerHTML = '<p>No playlists found.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching playlists:', error);
+            alert('Failed to list playlists. Please try again.');
+        }
+    }
+
+    async function searchSong() {
+        const query = document.getElementById('song-query').value;
+        if (!query) {
+            alert('Please enter a song name.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/spotify/search-song/?query=${query}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            displaySearchResults(data.tracks.items);
+        } catch (error) {
+            console.error('Error searching song:', error);
+            alert('Failed to search for song. Please try again.');
+        }
+    }
+
+    // Display search results
+    function displaySearchResults(songs) {
+        const resultsDiv = document.getElementById('search-results');
+        resultsDiv.innerHTML = '';  // Clear previous results
+
+        if (songs.length === 0) {
+            resultsDiv.innerHTML = '<p>No songs found.</p>';
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        songs.forEach(song => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+            <strong>${song.name}</strong> by ${song.artists.map(artist => artist.name).join(', ')}
+            <br>Song ID: ${song.id}
+            <br>Track URI: ${song.uri}  <!-- Displaying the track URI -->
+            <br><a href="${song.external_urls.spotify}" target="_blank">Listen on Spotify</a>
+            <button onclick="playTrack('${song.uri}')">Play</button>  <!-- Add Play button -->
+            <br>
+            <br>
+        `;
+            ul.appendChild(li);
+        });
+        resultsDiv.appendChild(ul);
+    }
+
+
+    // Add a song to the playlist
+    async function addToPlaylist() {
+        const playlistId = document.getElementById('playlist-id-add').value;
+        const songId = document.getElementById('song-id-add').value;
+        const csrftoken = getCookie('csrftoken');
+
+        if (!playlistId || !songId) {
+            alert('Please enter both playlist ID and song ID.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/spotify/add-song-to-playlist/${playlistId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ song_id: songId })  // Ensure song_id is sent correctly
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert(`Song added to playlist: ${playlistId}`);
+        } catch (error) {
+            console.error('Error adding song to playlist:', error);
+            alert('Failed to add song to playlist. Please try again.');
+        }
+    }
+
+    async function initializeSpotifyPlayer() {
+        // Fetch the access token from your backend
+        const response = await fetch('/spotify/get-access-token');
         const data = await response.json();
-        const playlistsDiv = document.getElementById('playlists');
-        playlistsDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+
+        if (response.ok) {
+            const accessToken = data.access_token;
+
+            // Initialize the Spotify Web Playback SDK
+            const player = new Spotify.Player({
+                name: 'Web Player',
+                getOAuthToken: cb => { cb(accessToken); },
+                volume: 0.5
+            });
+
+            // Connect to the player!
+            player.connect();
+
+            // Add event listeners
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            // Listen for player state changes
+            player.addListener('player_state_changed', state => {
+                console.log(state);
+                if (state) {
+                    document.getElementById('track-name').innerText = state.track_window.current_track.name;
+                    document.getElementById('track-artist').innerText = state.track_window.current_track.artists[0].name;
+                }
+            });
+        } else {
+            console.error('Failed to fetch access token:', data.error);
+        }
+    }
+
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        initializeSpotifyPlayer();
+    };
+
+    async function playTrack(trackUri) {
+        try {
+            const response = await fetch(`/spotify/play-track`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ uris: [trackUri] })
+            });
+
+            if (response.ok) {
+                console.log('Track is now playing');
+            } else {
+                const errorData = await response.json();
+                throw new Error(`Error ${errorData.error.status}: ${errorData.error.message}`);
+            }
+        } catch (error) {
+            console.error('Error playing track:', error);
+            alert(`Failed to play track: ${error.message}`);
+        }
+    }
+
+
+    function playerTrack() {
+        const trackUri = 'spotify:track:YOUR_TRACK_ID'; // Replace with the track ID you want to play
+        player.resume().then(() => {
+            console.log('Resumed!');
+            player.play({ uris: [trackUri] });
+        });
+    }
+
+    function pauseTrack() {
+        player.pause().then(() => {
+            console.log('Paused!');
+        });
+    }
+
+    function skipTrack() {
+        player.nextTrack().then(() => {
+            console.log('Skipped to next track!');
+        });
     }
 </script>
 </body>
