@@ -27,6 +27,8 @@ urlpatterns = [
 
     path('chat/', MIUWApp_views.chat, name='chat'),
 
+    path('menu/', MIUWApp_views.menu, name='Menu'),
+
     path('spotify/login', Api_views.AuthenticationURL.as_view(), name='spotify-login'),
     path('spotify/redirect', Api_views.spotify_redirect, name='spotify-redirect'),
     path('spotify/check-auth', Api_views.CheckAuthentication.as_view(), name='spotify-check-auth'),
@@ -34,7 +36,6 @@ urlpatterns = [
     path('spotify/modify-playlist/<str:playlist_id>', Api_views.ModifyPlaylist.as_view(), name='modify-playlist'),
     path('spotify/list-playlists', Api_views.ListPlaylists.as_view(), name='list-playlists'),
     path('profile/',MIUWApp_views.perfil, name='profile'),
-    path('signup/', MIUWApp_views.menu, name='menu'),
     path('signupaccount/', MIUWApp_views.signupaccount, name='signupaccount'),
     path('logout/', MIUWApp_views.LogOUT,name='LogOut'),
     path('login/', MIUWApp_views.LogIN, name='LogIn'),

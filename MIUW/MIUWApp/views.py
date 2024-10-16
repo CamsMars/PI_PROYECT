@@ -18,7 +18,7 @@ def chat(request):
     return render(request, 'chat.html')
 
 def menu(request):
-    return render(request, 'sign_up.html')
+    return render(request, 'Menu.html')
 
 def signupaccount(request):
     if request.method == 'GET':
