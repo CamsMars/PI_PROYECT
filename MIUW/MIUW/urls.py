@@ -20,15 +20,13 @@ from MIUWApp import views as MIUWApp_views
 from Api import views as Api_views
 from django.urls import path
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MIUWApp_views.home, name='home'),
     path('about/', MIUWApp_views.about, name='chattest'),
-
     path('chat/', MIUWApp_views.chat, name='chat'),
-
     path('menu/', MIUWApp_views.menu, name='Menu'),
-
     path('spotify/login', Api_views.AuthenticationURL.as_view(), name='spotify-login'),
     path('spotify/redirect', Api_views.spotify_redirect, name='spotify-redirect'),
     path('spotify/check-auth', Api_views.CheckAuthentication.as_view(), name='spotify-check-auth'),
