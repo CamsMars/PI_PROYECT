@@ -35,4 +35,3 @@ class MESSAGE(models.Model):
 class PLAYLIST(models.Model):
     ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
     LINK_PLAYLIST=models.CharField(max_length=700, null=True)
-
