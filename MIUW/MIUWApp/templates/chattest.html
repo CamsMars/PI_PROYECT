@@ -95,6 +95,8 @@
         return cookieValue;
     }
 
+    let player;
+
     function authenticateSpotify() {
         window.location.href = '/spotify/login';
     }
@@ -296,32 +298,54 @@
     }
 
     async function initializeSpotifyPlayer() {
-        // Fetch the access token from your backend
         const response = await fetch('/spotify/get-access-token');
         const data = await response.json();
 
         if (response.ok) {
             const accessToken = data.access_token;
 
-            // Initialize the Spotify Web Playback SDK
-            const player = new Spotify.Player({
+            player = new Spotify.Player({
                 name: 'Web Player',
                 getOAuthToken: cb => { cb(accessToken); },
                 volume: 0.5
             });
 
-            // Connect to the player!
-            player.connect();
+            // Connect to the player
+            player.connect().then(success => {
+                if (success) {
+                    console.log('The Web Playback SDK successfully connected to Spotify!');
+                    player.getCurrentState().then(state => {
+                        if (!state) {
+                            console.error('User is not connected to an active device');
+                        }
+                    });
+                }
+            });
 
             // Add event listeners
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+
+                // Set this device as the active one
+                fetch(`https://api.spotify.com/v1/me/player`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        device_ids: [device_id],
+                        play: false  // Set to false to not auto-play
+                    })
+                });
+            });
+
             player.addListener('initialization_error', ({ message }) => { console.error(message); });
             player.addListener('authentication_error', ({ message }) => { console.error(message); });
             player.addListener('account_error', ({ message }) => { console.error(message); });
             player.addListener('playback_error', ({ message }) => { console.error(message); });
 
-            // Listen for player state changes
             player.addListener('player_state_changed', state => {
-                console.log(state);
                 if (state) {
                     document.getElementById('track-name').innerText = state.track_window.current_track.name;
                     document.getElementById('track-artist').innerText = state.track_window.current_track.artists[0].name;
@@ -361,10 +385,8 @@
 
 
     function playerTrack() {
-        const trackUri = 'spotify:track:YOUR_TRACK_ID'; // Replace with the track ID you want to play
         player.resume().then(() => {
             console.log('Resumed!');
-            player.play({ uris: [trackUri] });
         });
     }
 

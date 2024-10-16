@@ -22,15 +22,17 @@
             </div>
             {% endif %}
 
-           
-            <form method="POST">
-              <input type="text" class="form-control mb-3" placeholder="Nombre de Usuario">
-              <input type="password" class="form-control mb-3" placeholder="Contraseña">
-              <button type="submit" class="btn btn-primary btn-block mt-3">
-                Sign Up
-              </button>
-            </form>
-          </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" class="form-control mb-3" name="username" placeholder="Nombre de Usuario">
+                    <input type="password" class="form-control mb-3" name="password1" placeholder="Contraseña">
+                    <input type="password" class="form-control mb-3" name="password2" placeholder="Confirmar Contraseña">
+                    <button type="submit" class="btn btn-primary btn-block mt-3">
+                        Sign Up
+                    </button>
+                </form>
+            </div>
         </div>
       </div>
     </div>
