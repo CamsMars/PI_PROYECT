@@ -1,10 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth. forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
-from django.shortcuts import redirect
 from django.db import IntegrityError
 from Api.models import Usuario
 
@@ -29,12 +28,18 @@ def signupaccount(request):
             try: 
                 user =User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 user.save()
+
+                n=request.POST['username']
+                ts=Usuario.objects.create(USR=n)
+                ts.save()
+
                 login(request, user)
                 return redirect('home')
             except IntegrityError:
                 return render(request, 'signupaccount.html',{'form':UserCreationForm, 'error':'usuario ya exixte'})
         else :
             return render(request, 'signupaccount.html', {'form':UserCreationForm, 'error':'password no coincide'})
+
 
 def LogOUT(request):
     logout(request)

@@ -2,6 +2,16 @@
 
 from django.db import migrations, models
 
+def create_trigger(apps, schema_editor):
+    schema_editor.execute("""
+    CREATE TRIGGER reparto_nombres
+    AFTER INSERT ON auth_user
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO api_usuario (usuario) VALUES (NEW.username);
+    END;
+    """)
+
 
 class Migration(migrations.Migration):
 
@@ -18,6 +28,9 @@ class Migration(migrations.Migration):
                 ('SUGERIDA_PLYST', models.CharField(max_length=700)),
                 ('CREACION', models.DateField()),
             ],
+        ),
+        migrations.RunPython(
+            create_trigger
         ),
         migrations.CreateModel(
             name='MESSAGE',
