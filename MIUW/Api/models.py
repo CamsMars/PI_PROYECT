@@ -8,14 +8,30 @@ class Token(models.Model):
     expires_in = models.DateTimeField()
     token_type = models.CharField(max_length=50)
 
-class User(models.Model):
-    Usuario = models.CharField(unique = True, max_length=50)
-    Nombre = models.CharField(unique=False,max_length=25)
-    Apellido = models.CharField(unique=False, max_length=25)
-    Email = models.CharField(unique=True,max_length=25)
-    Tpassw = models.CharField(unique=True,max_length=500)
-    IA_Data = models.CharField(unique=True, max_length=700)
-    Gustos = models.CharField(unique=False,null=True,max_length=700)
+class Usuario(models.Model):
+    USR = models.CharField(max_length=150)
+    Nombre = models.CharField(unique=False,max_length=25, blank=True)
+    Apellido = models.CharField(unique=False, max_length=25, blank=True)
+    Email = models.EmailField()
+    tokenSPFY = models.CharField(unique=True, max_length=700, blank=True)
+    SPFY_plan=models.CharField(max_length=50, blank=True)
+    MusicalPreference = models.CharField(unique=False,max_length=700, blank=True)
+    Artistas_FAV = models.CharField(unique=False,null=True,max_length=700, blank=True)
+    Hystorial = models.CharField(unique=False,max_length=700, blank=True)
     User_BirthDate = models.DateField()
     UserCreateDate = models.DateTimeField()
 
+class CHAT(models.Model):
+    ID_CHAT=models.IntegerField(primary_key=True, null=False)
+    Generated_PLYST=models.CharField(max_length=700, null=True)
+    SUGERIDA_PLYST=models.CharField(max_length=700, null=True)
+    CREACION=models.DateField(null=True)
+
+class MESSAGE(models.Model):
+    ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
+    USER_DESCRIP=models.TextField()
+    FECHA=models.DateField()
+
+class PLAYLIST(models.Model):
+    ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
+    LINK_PLAYLIST=models.CharField(max_length=700, null=True)

@@ -25,6 +25,10 @@ urlpatterns = [
     path('about/', MIUWApp_views.about, name='chattest'),
 
     path('chat/', MIUWApp_views.chat, name='chat'),
+    path('profile/',MIUWApp_views.perfil, name='profile'),
+    path('signupaccount/', MIUWApp_views.signupaccount, name='signupaccount'),
+    path('logout/', MIUWApp_views.LogOUT,name='LogOut'),
+    path('login/', MIUWApp_views.LogIN, name='LogIn'),
 
     path('spotify/login', Api_views.AuthenticationURL.as_view(), name='spotify-login'),
     path('spotify/redirect', Api_views.spotify_redirect, name='spotify-redirect'),
