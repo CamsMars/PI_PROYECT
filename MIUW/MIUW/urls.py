@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from MIUWApp import views as MIUWApp_views
 from Api import views as Api_views
+from AcountService import views as ACviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,9 +27,10 @@ urlpatterns = [
 
     path('chat/', MIUWApp_views.chat, name='chat'),
     path('profile/',MIUWApp_views.perfil, name='profile'),
-    path('signupaccount/', MIUWApp_views.signupaccount, name='signupaccount'),
-    path('logout/', MIUWApp_views.LogOUT,name='LogOut'),
-    path('login/', MIUWApp_views.LogIN, name='LogIn'),
+
+    path('signupaccount/', ACviews.signupaccount, name='signupaccount'),
+    path('logout/', ACviews.logoutaccount, name='logoutaccount'),
+    path('login/', ACviews.loginaccount, name='loginaccount'),
 
     path('spotify/login', Api_views.AuthenticationURL.as_view(), name='spotify-login'),
     path('spotify/redirect', Api_views.spotify_redirect, name='spotify-redirect'),

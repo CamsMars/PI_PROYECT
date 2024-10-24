@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'MIUWApp',
     'Api.apps.ApiConfig',
     'corsheaders',
+    'AcountService',
 ]
 
 MIDDLEWARE = [
