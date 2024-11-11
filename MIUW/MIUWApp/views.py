@@ -2,6 +2,7 @@ import os
 import google.generativeai as genai
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -34,4 +35,30 @@ def about(request):
 
 
 def perfil(request):
-    return render(request, 'profile.html')
+    if request.user.is_authenticated:
+        if request.method == "POST":
+        # Accede a los datos enviados desde el formulario
+            name = request.POST.get("name")
+            last_name = request.POST.get("last-name")
+            email = request.POST.get("email")
+            username = request.POST.get("username")
+            password = request.POST.get("password")
+            favorites = request.POST.get("favorites")
+            feelings = request.POST.get("feelings")
+            print(name,last_name,email,username,password,favorites,feelings)
+
+        # Obtiene el perfil del usuario actual o crea uno nuevo
+        #profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+        # Asigna los datos al perfil
+        #profile.name = name
+        #profile.last_name = last_name
+        #profile.email = email
+        #profile.username = username
+        #profile.password = password  # Recuerda manejar la contraseña de forma segura
+        #profile.feelings = feelings
+        #profile.save()  # Guarda los cambios
+        return render(request, 'profile.html')
+    else:
+        # Si el usuario no está autenticado, redirigir al login
+        return redirect('loginaccount')
