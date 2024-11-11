@@ -1,406 +1,549 @@
+{% block content %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Playlist Manager</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIUW - Spotify Playlist Manager</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'MIUWApp/templates/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    nav ul li a:hover {
+        background-color: #dab1de9a; /* Color al pasar el ratón por encima */
+    }
+
+    .btn-custom {
+        background-color: #0056b3;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: inline-block; /* Asegura que el botón esté en línea pero en su propio bloque */
+        transition: background-color 0.3s;
+        background-position: center; /* Establece la posición del fondo */
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3; /* Cambia el color al pasar el mouse */
+    }
+    body {
+        background-color: #0D0D0D;
+        font-family: 'Poppins', sans-serif;
+        color: #FFFFFF;
+        margin: 0;
+        padding: 0;
+     }
+
+    .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 0 10px #0b010f;
+     }
+
+    header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 30px;
+        font-weight: bold;
+        margin: 30px;
+    }
+
+    h4 {
+        font-size: 19px;
+        font-weight: bold;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #0D0D0D;
+        border-radius: 4px;
+        background-color: #ffffff;
+        color: #000000;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+        color: #AAAAAA;
+        }
+
+    .preferences {
+        display: flex;
+        flex-wrap: wrap;
+     }
+
+    .tag {
+        background-color: #444;
+        color: #FFFFFF;
+        padding: 5px 10px;
+        border-radius: 20px;
+        margin: 5px;
+        cursor: pointer;
+    }
+</style>
 <body>
-<h1>Spotify Playlist Manager</h1>
+    <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static "images/logotipo_morado.png" %}" alt="MIUW Logo" style="height: 40px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'chat' %}">Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'profile' %}">Profile</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">More</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'loginaccount' %}">Log in</a></li>
+                            <li><a class="dropdown-item" href="{% url 'signupaccount' %}">Sign up</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <header>
+            <h1>Spotify Playlist Manager</h1>
+        </header>
+        <form>
 
-<!-- Button to authenticate with Spotify -->
-<h2>Authenticate with Spotify</h2>
-<button type="button" onclick="authenticateSpotify()">Authenticate</button>
+        <!-- Button to authenticate with Spotify -->
+        <h4 style="margin-top: 30px;">Authenticate with Spotify</h4>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" type="submit" onclick="authenticateSpotify()">Authenticate</button>
+        </div>
+        <div id="spotify-player">
+            <h4 style="margin-top: 30px;">Spotify Player</h4>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" type="submit" onclick="playerTrack()">Play</button>
+                <button class="btn btn-primary" type="submit" onclick="pauseTrack()">Pause</button>
+                <button class="btn btn-primary" type="submit" onclick="skipTrack()">Next</button>
+            </div>
+            <div id="track-info">
+                <p id="track-name"></p>
+                <p id="track-artist"></p>
+            </div>
+        </div>
 
-<div id="spotify-player">
-    <h2>Spotify Player</h2>
-    <button onclick="playerTrack()">Play</button>
-    <button onclick="pauseTrack()">Pause</button>
-    <button onclick="skipTrack()">Next</button>
-    <div id="track-info">
-        <p id="track-name"></p>
-        <p id="track-artist"></p>
-    </div>
-</div>
+        <!-- Form to create a new playlist -->
+        <h4 style="margin-top: 30px;">Create Playlist</h4>
+        <form id="create-playlist-form">
+            <label for="playlist-name">Playlist Name:</label>
+            <input type="text" id="playlist-name" name="name" required>
+            <br>
+            <label for="playlist-description">Playlist Description:</label>
+            <input type="text" id="playlist-description" name="description" required>
+            <br>
+            <button class="btn btn-primary" type="submit" type="button" style="margin-top: 20px;" onclick="createPlaylist()">Create Playlist</button>
+        </form>
 
-<!-- Form to create a new playlist -->
-<h2>Create Playlist</h2>
-<form id="create-playlist-form">
-    <label for="playlist-name">Playlist Name:</label>
-    <input type="text" id="playlist-name" name="name" required>
-    <br>
-    <label for="playlist-description">Playlist Description:</label>
-    <input type="text" id="playlist-description" name="description" required>
-    <br>
-    <button type="button" onclick="createPlaylist()">Create Playlist</button>
-</form>
+        <!-- Form to modify an existing playlist -->
+        <h4 style="margin-top: 30px;">Modify Playlist</h4>
+        <form id="modify-playlist-form">
+            <label for="playlist-id">Playlist ID:</label>
+            <input type="text" id="playlist-id" name="playlist_id" required>
+            <br>
+            <label for="new-playlist-name">New Playlist Name:</label>
+            <input type="text" id="new-playlist-name" name="name" required>
+            <br>
+            <label for="new-playlist-description">New Playlist Description:</label>
+            <input type="text" id="new-playlist-description" name="description" required>
+            <br>
+            <button class="btn btn-primary"  style="margin-top: 20px;" type="submit" onclick="modifyPlaylist()">Modify Playlist</button>
+        </form>
 
-<!-- Form to modify an existing playlist -->
-<h2>Modify Playlist</h2>
-<form id="modify-playlist-form">
-    <label for="playlist-id">Playlist ID:</label>
-    <input type="text" id="playlist-id" name="playlist_id" required>
-    <br>
-    <label for="new-playlist-name">New Playlist Name:</label>
-    <input type="text" id="new-playlist-name" name="name" required>
-    <br>
-    <label for="new-playlist-description">New Playlist Description:</label>
-    <input type="text" id="new-playlist-description" name="description" required>
-    <br>
-    <button type="button" onclick="modifyPlaylist()">Modify Playlist</button>
-</form>
+        <!-- Button to list all playlists -->
+        <h4 style="margin-top: 30px;">List Playlists</h4>
+        <button class="btn btn-primary" type="submit" style="margin-top: 20px;" onclick="listPlaylists()">List Playlists</button>
+        <div id="playlists"></div>
 
-<!-- Button to list all playlists -->
-<h2>List Playlists</h2>
-<button type="button" onclick="listPlaylists()">List Playlists</button>
-<div id="playlists"></div>
+        <!-- Search for a song -->
+        <h4 style="margin-top: 30px;">Search for a Song</h4>
+        <form id="search-song-form">
+            <label for="song-query">Song Name:</label>
+            <input type="text" id="song-query" name="song-query" required>
+            <br>
+            <button class="btn btn-primary" type="submit" style="margin-top: 20px;" onclick="searchSong()">Search</button>
+        </form>
+        <div id="search-results"></div>
 
-<!-- Search for a song -->
-<h2>Search for a Song</h2>
-<form id="search-song-form">
-    <label for="song-query">Song Name:</label>
-    <input type="text" id="song-query" name="song-query" required>
-    <br>
-    <button type="button" onclick="searchSong()">Search</button>
-</form>
-<div id="search-results"></div>
+        <!-- Form to add a song to a playlist -->
+        <h4 style="margin-top: 30px;">Add Song to Playlist</h4>
+        <form id="add-song-form">
+            <label for="playlist-id-add">Playlist ID:</label>
+            <input type="text" id="playlist-id-add" name="playlist-id" required>
+            <br>
+            <label for="song-id-add">Song ID:</label>
+            <input type="text" id="song-id-add" name="song-id" required>
+            <br>
+            <button class="btn btn-primary" type="submit" style="margin-top: 20px;" onclick="addToPlaylist()">Add Song to Playlist</button>
+        </form>
 
-<!-- Form to add a song to a playlist -->
-<h2>Add Song to Playlist</h2>
-<form id="add-song-form">
-    <label for="playlist-id-add">Playlist ID:</label>
-    <input type="text" id="playlist-id-add" name="playlist-id" required>
-    <br>
-    <label for="song-id-add">Song ID:</label>
-    <input type="text" id="song-id-add" name="song-id" required>
-    <br>
-    <button type="button" onclick="addToPlaylist()">Add Song to Playlist</button>
-</form>
+        <script>
 
-<script>
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+            let player;
+
+            function authenticateSpotify() {
+                window.location.href = '/spotify/login';
+            }
+
+            async function createPlaylist() {
+                const name = document.getElementById('playlist-name').value;
+                const description = document.getElementById('playlist-description').value;
+                const csrftoken = getCookie('csrftoken');
+
+                try {
+                    const response = await fetch('/spotify/create-playlist', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({ name, description })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    alert('Playlist created: ' + JSON.stringify(data));
+                } catch (error) {
+                    console.error('Error creating playlist:', error);
+                    alert('Failed to create playlist. Please try again.');
                 }
             }
-        }
-        return cookieValue;
-    }
 
-    let player;
+            async function modifyPlaylist() {
+                const playlistId = document.getElementById('playlist-id').value;
+                const name = document.getElementById('new-playlist-name').value;
+                const description = document.getElementById('new-playlist-description').value;
 
-    function authenticateSpotify() {
-        window.location.href = '/spotify/login';
-    }
+                const csrftoken = getCookie('csrftoken');  // Add this line if CSRF token is needed
 
-    async function createPlaylist() {
-        const name = document.getElementById('playlist-name').value;
-        const description = document.getElementById('playlist-description').value;
-        const csrftoken = getCookie('csrftoken');
+                try {
+                    const response = await fetch(`/spotify/modify-playlist/${playlistId}`, {
+                        method: 'PUT',  // Change from POST to PUT
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({ name, description })
+                    });
 
-        try {
-            const response = await fetch('/spotify/create-playlist', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({ name, description })
-            });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            alert('Playlist created: ' + JSON.stringify(data));
-        } catch (error) {
-            console.error('Error creating playlist:', error);
-            alert('Failed to create playlist. Please try again.');
-        }
-    }
-
-    async function modifyPlaylist() {
-        const playlistId = document.getElementById('playlist-id').value;
-        const name = document.getElementById('new-playlist-name').value;
-        const description = document.getElementById('new-playlist-description').value;
-
-        const csrftoken = getCookie('csrftoken');  // Add this line if CSRF token is needed
-
-        try {
-            const response = await fetch(`/spotify/modify-playlist/${playlistId}`, {
-                method: 'PUT',  // Change from POST to PUT
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({ name, description })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            alert('Playlist modified: ' + JSON.stringify(data));
-        } catch (error) {
-            console.error('Error modifying playlist:', error);
-            alert('Failed to modify playlist. Please try again.');
-        }
-    }
-
-
-    async function listPlaylists() {
-        try {
-            const response = await fetch('/spotify/list-playlists', {
-                method: 'GET'
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const playlistsDiv = document.getElementById('playlists');
-
-            // Clear previous data
-            playlistsDiv.innerHTML = '';
-
-            // Check if there are playlists
-            if (data.items && data.items.length > 0) {
-                data.items.forEach(playlist => {
-                    // Create elements for each piece of information
-                    const playlistContainer = document.createElement('div');
-                    playlistContainer.classList.add('playlist');
-
-                    const name = document.createElement('h3');
-                    name.textContent = `Name: ${playlist.name}`;
-
-                    const description = document.createElement('p');
-                    description.textContent = `Description: ${playlist.description || 'No description'}`;
-
-                    const url = document.createElement('a');
-                    url.href = playlist.external_urls.spotify;
-                    url.target = '_blank';
-                    url.textContent = 'Open Playlist';
-
-                    const id = document.createElement('p');
-                    id.textContent = `Playlist ID: ${playlist.id}`;
-
-                    // Append the elements to the container
-                    playlistContainer.appendChild(name);
-                    playlistContainer.appendChild(description);
-                    playlistContainer.appendChild(url);
-                    playlistContainer.appendChild(id);
-
-                    // Append the container to the playlists div
-                    playlistsDiv.appendChild(playlistContainer);
-                });
-            } else {
-                playlistsDiv.innerHTML = '<p>No playlists found.</p>';
-            }
-        } catch (error) {
-            console.error('Error fetching playlists:', error);
-            alert('Failed to list playlists. Please try again.');
-        }
-    }
-
-    async function searchSong() {
-        const query = document.getElementById('song-query').value;
-        if (!query) {
-            alert('Please enter a song name.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/spotify/search-song/?query=${query}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
+                    const data = await response.json();
+                    alert('Playlist modified: ' + JSON.stringify(data));
+                } catch (error) {
+                    console.error('Error modifying playlist:', error);
+                    alert('Failed to modify playlist. Please try again.');
                 }
-            });
-
-            const data = await response.json();
-            displaySearchResults(data.tracks.items);
-        } catch (error) {
-            console.error('Error searching song:', error);
-            alert('Failed to search for song. Please try again.');
-        }
-    }
-
-    // Display search results
-    function displaySearchResults(songs) {
-        const resultsDiv = document.getElementById('search-results');
-        resultsDiv.innerHTML = '';  // Clear previous results
-
-        if (songs.length === 0) {
-            resultsDiv.innerHTML = '<p>No songs found.</p>';
-            return;
-        }
-
-        const ul = document.createElement('ul');
-        songs.forEach(song => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-            <strong>${song.name}</strong> by ${song.artists.map(artist => artist.name).join(', ')}
-            <br>Song ID: ${song.id}
-            <br>Track URI: ${song.uri}  <!-- Displaying the track URI -->
-            <br><a href="${song.external_urls.spotify}" target="_blank">Listen on Spotify</a>
-            <button onclick="playTrack('${song.uri}')">Play</button>  <!-- Add Play button -->
-            <br>
-            <br>
-        `;
-            ul.appendChild(li);
-        });
-        resultsDiv.appendChild(ul);
-    }
-
-
-    // Add a song to the playlist
-    async function addToPlaylist() {
-        const playlistId = document.getElementById('playlist-id-add').value;
-        const songId = document.getElementById('song-id-add').value;
-        const csrftoken = getCookie('csrftoken');
-
-        if (!playlistId || !songId) {
-            alert('Please enter both playlist ID and song ID.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/spotify/add-song-to-playlist/${playlistId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({ song_id: songId })  // Ensure song_id is sent correctly
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
-            alert(`Song added to playlist: ${playlistId}`);
-        } catch (error) {
-            console.error('Error adding song to playlist:', error);
-            alert('Failed to add song to playlist. Please try again.');
-        }
-    }
 
-    async function initializeSpotifyPlayer() {
-        const response = await fetch('/spotify/get-access-token');
-        const data = await response.json();
+            async function listPlaylists() {
+                try {
+                    const response = await fetch('/spotify/list-playlists', {
+                        method: 'GET'
+                    });
 
-        if (response.ok) {
-            const accessToken = data.access_token;
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
-            player = new Spotify.Player({
-                name: 'Web Player',
-                getOAuthToken: cb => { cb(accessToken); },
-                volume: 0.5
-            });
+                    const data = await response.json();
+                    const playlistsDiv = document.getElementById('playlists');
 
-            // Connect to the player
-            player.connect().then(success => {
-                if (success) {
-                    console.log('The Web Playback SDK successfully connected to Spotify!');
-                    player.getCurrentState().then(state => {
-                        if (!state) {
-                            console.error('User is not connected to an active device');
+                    // Clear previous data
+                    playlistsDiv.innerHTML = '';
+
+                    // Check if there are playlists
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach(playlist => {
+                            // Create elements for each piece of information
+                            const playlistContainer = document.createElement('div');
+                            playlistContainer.classList.add('playlist');
+
+                            const name = document.createElement('h3');
+                            name.textContent = `Name: ${playlist.name}`;
+
+                            const description = document.createElement('p');
+                            description.textContent = `Description: ${playlist.description || 'No description'}`;
+
+                            const url = document.createElement('a');
+                            url.href = playlist.external_urls.spotify;
+                            url.target = '_blank';
+                            url.textContent = 'Open Playlist';
+
+                            const id = document.createElement('p');
+                            id.textContent = `Playlist ID: ${playlist.id}`;
+
+                            // Append the elements to the container
+                            playlistContainer.appendChild(name);
+                            playlistContainer.appendChild(description);
+                            playlistContainer.appendChild(url);
+                            playlistContainer.appendChild(id);
+
+                            // Append the container to the playlists div
+                            playlistsDiv.appendChild(playlistContainer);
+                        });
+                    } else {
+                        playlistsDiv.innerHTML = '<p>No playlists found.</p>';
+                    }
+                } catch (error) {
+                    console.error('Error fetching playlists:', error);
+                    alert('Failed to list playlists. Please try again.');
+                }
+            }
+
+            async function searchSong() {
+                const query = document.getElementById('song-query').value;
+                if (!query) {
+                    alert('Please enter a song name.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/spotify/search-song/?query=${query}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
                     });
+
+                    const data = await response.json();
+                    displaySearchResults(data.tracks.items);
+                } catch (error) {
+                    console.error('Error searching song:', error);
+                    alert('Failed to search for song. Please try again.');
                 }
-            });
-
-            // Add event listeners
-            player.addListener('ready', ({ device_id }) => {
-                console.log('Ready with Device ID', device_id);
-
-                // Set this device as the active one
-                fetch(`https://api.spotify.com/v1/me/player`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        device_ids: [device_id],
-                        play: false  // Set to false to not auto-play
-                    })
-                });
-            });
-
-            player.addListener('initialization_error', ({ message }) => { console.error(message); });
-            player.addListener('authentication_error', ({ message }) => { console.error(message); });
-            player.addListener('account_error', ({ message }) => { console.error(message); });
-            player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-            player.addListener('player_state_changed', state => {
-                if (state) {
-                    document.getElementById('track-name').innerText = state.track_window.current_track.name;
-                    document.getElementById('track-artist').innerText = state.track_window.current_track.artists[0].name;
-                }
-            });
-        } else {
-            console.error('Failed to fetch access token:', data.error);
-        }
-    }
-
-
-    window.onSpotifyWebPlaybackSDKReady = () => {
-        initializeSpotifyPlayer();
-    };
-
-    async function playTrack(trackUri) {
-        try {
-            const response = await fetch(`/spotify/play-track`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ uris: [trackUri] })
-            });
-
-            if (response.ok) {
-                console.log('Track is now playing');
-            } else {
-                const errorData = await response.json();
-                throw new Error(`Error ${errorData.error.status}: ${errorData.error.message}`);
             }
-        } catch (error) {
-            console.error('Error playing track:', error);
-            alert(`Failed to play track: ${error.message}`);
-        }
-    }
+
+            // Display search results
+            function displaySearchResults(songs) {
+                const resultsDiv = document.getElementById('search-results');
+                resultsDiv.innerHTML = '';  // Clear previous results
+
+                if (songs.length === 0) {
+                    resultsDiv.innerHTML = '<p>No songs found.</p>';
+                    return;
+                }
+
+                const ul = document.createElement('ul');
+                songs.forEach(song => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                    <strong>${song.name}</strong> by ${song.artists.map(artist => artist.name).join(', ')}
+                    <br>Song ID: ${song.id}
+                    <br>Track URI: ${song.uri}  <!-- Displaying the track URI -->
+                    <br><a href="${song.external_urls.spotify}" target="_blank">Listen on Spotify</a>
+                    <button onclick="playTrack('${song.uri}')">Play</button>  <!-- Add Play button -->
+                    <br>
+                    <br>
+                `;
+                    ul.appendChild(li);
+                });
+                resultsDiv.appendChild(ul);
+            }
 
 
-    function playerTrack() {
-        player.resume().then(() => {
-            console.log('Resumed!');
-        });
-    }
+            // Add a song to the playlist
+            async function addToPlaylist() {
+                const playlistId = document.getElementById('playlist-id-add').value;
+                const songId = document.getElementById('song-id-add').value;
+                const csrftoken = getCookie('csrftoken');
 
-    function pauseTrack() {
-        player.pause().then(() => {
-            console.log('Paused!');
-        });
-    }
+                if (!playlistId || !songId) {
+                    alert('Please enter both playlist ID and song ID.');
+                    return;
+                }
 
-    function skipTrack() {
-        player.nextTrack().then(() => {
-            console.log('Skipped to next track!');
-        });
-    }
-</script>
+                try {
+                    const response = await fetch(`/spotify/add-song-to-playlist/${playlistId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({ song_id: songId })  // Ensure song_id is sent correctly
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    alert(`Song added to playlist: ${playlistId}`);
+                } catch (error) {
+                    console.error('Error adding song to playlist:', error);
+                    alert('Failed to add song to playlist. Please try again.');
+                }
+            }
+
+            async function initializeSpotifyPlayer() {
+                const response = await fetch('/spotify/get-access-token');
+                const data = await response.json();
+
+                if (response.ok) {
+                    const accessToken = data.access_token;
+
+                    player = new Spotify.Player({
+                        name: 'Web Player',
+                        getOAuthToken: cb => { cb(accessToken); },
+                        volume: 0.5
+                    });
+
+                    // Connect to the player
+                    player.connect().then(success => {
+                        if (success) {
+                            console.log('The Web Playback SDK successfully connected to Spotify!');
+                            player.getCurrentState().then(state => {
+                                if (!state) {
+                                    console.error('User is not connected to an active device');
+                                }
+                            });
+                        }
+                    });
+
+                    // Add event listeners
+                    player.addListener('ready', ({ device_id }) => {
+                        console.log('Ready with Device ID', device_id);
+
+                        // Set this device as the active one
+                        fetch(`https://api.spotify.com/v1/me/player`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                device_ids: [device_id],
+                                play: false  // Set to false to not auto-play
+                            })
+                        });
+                    });
+
+                    player.addListener('initialization_error', ({ message }) => { console.error(message); });
+                    player.addListener('authentication_error', ({ message }) => { console.error(message); });
+                    player.addListener('account_error', ({ message }) => { console.error(message); });
+                    player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+                    player.addListener('player_state_changed', state => {
+                        if (state) {
+                            document.getElementById('track-name').innerText = state.track_window.current_track.name;
+                            document.getElementById('track-artist').innerText = state.track_window.current_track.artists[0].name;
+                        }
+                    });
+                } else {
+                    console.error('Failed to fetch access token:', data.error);
+                }
+            }
+
+
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                initializeSpotifyPlayer();
+            };
+
+            async function playTrack(trackUri) {
+                try {
+                    const response = await fetch(`/spotify/play-track`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ uris: [trackUri] })
+                    });
+
+                    if (response.ok) {
+                        console.log('Track is now playing');
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(`Error ${errorData.error.status}: ${errorData.error.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error playing track:', error);
+                    alert(`Failed to play track: ${error.message}`);
+                }
+            }
+
+
+            function playerTrack() {
+                player.resume().then(() => {
+                    console.log('Resumed!');
+                });
+            }
+
+            function pauseTrack() {
+                player.pause().then(() => {
+                    console.log('Paused!');
+                });
+            }
+
+            function skipTrack() {
+                player.nextTrack().then(() => {
+                    console.log('Skipped to next track!');
+                });
+            }
+        </script>
+        </form>
+    </div>
 </body>
 </html>
+{% endblock content %}
