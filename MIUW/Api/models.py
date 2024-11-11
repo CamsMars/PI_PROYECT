@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Token(models.Model):
     user = models.CharField(unique = True, max_length=50)
@@ -9,17 +11,18 @@ class Token(models.Model):
     token_type = models.CharField(max_length=50)
 
 class usuario(models.Model):
-    USR = models.CharField(max_length=150)
-    Nombre = models.CharField(unique=False,max_length=25, blank=True)
+    id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    USR = models.CharField(max_length=150, unique=True)
+    Nombre = models.CharField(unique=False, max_length=25, blank=True)
     Apellido = models.CharField(unique=False, max_length=25, blank=True)
-    Email = models.EmailField()
+    Email = models.EmailField(blank=True)
     tokenSPFY = models.CharField(unique=True, max_length=700, blank=True)
-    SPFY_plan=models.CharField(max_length=50, blank=True)
-    MusicalPreference = models.CharField(unique=False,max_length=700, blank=True)
-    Artistas_FAV = models.CharField(unique=False,null=True,max_length=700, blank=True)
-    Hystorial = models.CharField(unique=False,max_length=700, blank=True)
-    User_BirthDate = models.DateField()
-    UserCreateDate = models.DateTimeField()
+    SPFY_plan = models.CharField(max_length=50, blank=True)
+    MusicalPreference = models.CharField(unique=False, max_length=700, blank=True)
+    Artistas_FAV = models.CharField(unique=False, null=True, max_length=700, blank=True)
+    Hystorial = models.CharField(unique=False, max_length=700, blank=True)
+    User_BirthDate = models.DateField(null=True, blank=True)
+    UserCreateDate = models.DateTimeField(default=timezone.now, blank=True)
 
 class CHAT(models.Model):
     ID_CHAT=models.IntegerField(primary_key=True, null=False)
@@ -28,6 +31,7 @@ class CHAT(models.Model):
     CREACION=models.DateField(null=True)
 
 class MESSAGE(models.Model):
+    ID_USER=models.ForeignKey(usuario, on_delete=models.CASCADE, null=True)
     ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
     USER_DESCRIP=models.TextField()
     FECHA=models.DateField()

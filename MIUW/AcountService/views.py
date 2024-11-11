@@ -22,9 +22,11 @@ def signupaccount(request):
                 user = User.objects.create_user(request.POST['username'],
                             password=request.POST['password1'])
                 user.save()
-                
+                print(1)
                 n = request.POST['username']
-                US.objects.create(USR=n)
+                print(2,n,user.id)
+                US.objects.create(id=user, USR=user.username)
+                print(3)
 
                 login(request, user)
                 return redirect('home')
