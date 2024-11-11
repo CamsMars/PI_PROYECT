@@ -165,77 +165,71 @@
         <header>
             <h1>Profile</h1>
         </header>
-        <form>
+        <form method="POST" action="{% url 'profile' %}">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" placeholder="Enter your name" required>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
             </div>
             <div class="form-group">
                 <label for="last-name">Last Name</label>
-                <input type="text" id="last-name" placeholder="Enter your last name" required>
+                <input type="text" id="last-name" name="last_name" placeholder="Enter your last name" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email" required>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
             </div>
             <div class="form-group">
-                <label>Top 10 favorites artists</label>
+                <label>Top 10 favorite artists</label>
                 <div class="preferences">
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
-                    <input type="text" id="fav-artist" placeholder="Enter their name" required>
+                    {% for i in "0123456789" %}
+                        <input type="text" id="fav-artist-{{ i }}" name="fav_artist_{{ i }}" placeholder="Enter artist name" required>
+                    {% endfor %}
                 </div>
             </div>
             <div class="emotion-preferences">
                 <div class="emotion-group">
                     <label for="happy">Emotion: Happy</label>
-                    <input type="text" id="happy" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="happy" name="happy" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="sad">Emotion: Sad</label>
-                    <input type="text" id="sad" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="sad" name="sad" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="calm">Emotion: Calm</label>
-                    <input type="text" id="calm" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="calm" name="calm" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="angry">Emotion: Angry</label>
-                    <input type="text" id="angry" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="angry" name="angry" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Euphoria</label>
-                    <input type="text" id="euphoria" placeholder="Genre of music you listen to" required>
+                    <label for="euphoria">Emotion: Euphoria</label>
+                    <input type="text" id="euphoria" name="euphoria" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Love</label>
-                    <input type="text" id="love" placeholder="Genre of music you listen to" required>
+                    <label for="love">Emotion: Love</label>
+                    <input type="text" id="love" name="love" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Motivation</label>
-                    <input type="text" id="motivation" placeholder="Genre of music you listen to" required>
+                    <label for="motivation">Emotion: Motivation</label>
+                    <input type="text" id="motivation" name="motivation" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Homesickness</label>
-                    <input type="text" id="homesickness" placeholder="Genre of music you listen to" required>
+                    <label for="homesickness">Emotion: Homesickness</label>
+                    <input type="text" id="homesickness" name="homesickness" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Melancholy</label>
-                    <input type="text" id="melancholy" placeholder="Genre of music you listen to" required>
+                    <label for="melancholy">Emotion: Melancholy</label>
+                    <input type="text" id="melancholy" name="melancholy" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
-                    <label for="excited">Emotion: Frustration</label>
-                    <input type="text" id="frustration" placeholder="Genre of music you listen to" required>
+                    <label for="frustration">Emotion: Frustration</label>
+                    <input type="text" id="frustration" name="frustration" placeholder="Genre of music you listen to" required>
                 </div>
-            </div>            
-            <div class="button"> <!-- Cambia 'botton' a 'button' -->
+            </div>          
+            <div class="button">
                 <button type="submit" class="btn-custom" style="margin-top: 20px;">Save Changes</button>
             </div>            
         </form>

@@ -15,6 +15,7 @@ def chat(request):
         user_input = request.POST.get("user_input", "")
 
         if user_input:
+
             user=request.user
             Salida3=f"hola soy {user.username} "+user_input
             #print(Salida3)# de Esta manera se puede cargar el historial a la IA
@@ -43,27 +44,49 @@ def about(request):
 def perfil(request):
     if request.user.is_authenticated:
         if request.method == "POST":
-        # Accede a los datos enviados desde el formulario
-            name = request.POST.get("name")
-            last_name = request.POST.get("last-name")
-            email = request.POST.get("email")
-            username = request.POST.get("username")
-            password = request.POST.get("password")
-            favorites = request.POST.get("favorites")
-            feelings = request.POST.get("feelings")
-            print(name,last_name,email,username,password,favorites,feelings)
 
-        # Obtiene el perfil del usuario actual o crea uno nuevo
-        #profile, created = UserProfile.objects.get_or_create(user=request.user)
+            name = request.POST.get('name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+            fav_artists = [request.POST.get(f'fav_artist_{i}') for i in range(10)]
+            happy_genre = request.POST.get('happy')
+            SAD_genre = request.POST.get('sad')
+            Calm_genre = request.POST.get('calm')
+            Angry_genre = request.POST.get('angry')
+            Euphoria_genre = request.POST.get('euphoria')
+            love_genre = request.POST.get('love')
+            Motivation_genre = request.POST.get('motivation')
+            Homesicknes_genre = request.POST.get('homesickness')
+            Melancoly_genre = request.POST.get('melancholy')
+            Frustration_genre = request.POST.get('frustration')
 
-        # Asigna los datos al perfil
-        #profile.name = name
-        #profile.last_name = last_name
-        #profile.email = email
-        #profile.username = username
-        #profile.password = password  # Recuerda manejar la contraseña de forma segura
-        #profile.feelings = feelings
-        #profile.save()  # Guarda los cambios
+            #print(f"Form data received: {name}, {last_name}, {email}, {fav_artists}, {happy_genre}, {SAD_genre}, {Calm_genre}, {Angry_genre}, {Euphoria_genre}, {love_genre}, {Motivation_genre}, {Homesicknes_genre}, {Melancoly_genre}, {Frustration_genre}")
+
+            Generos = [happy_genre, SAD_genre, Calm_genre, Angry_genre, Euphoria_genre,
+                       love_genre, Motivation_genre, Homesicknes_genre, Melancoly_genre, Frustration_genre]
+
+            #print(f"Genres list: {Generos}")
+
+        
+            user = request.user
+            
+            usuario_obj = usuario.objects.get(id=user)
+
+            
+            usuario_obj.Nombre = name
+            usuario_obj.Apellido = last_name
+            usuario_obj.Email = email
+            
+
+            
+            usuario_obj.Artistas_FAV = ', '.join(fav_artists)
+
+            usuario_obj.MusicalPreference = ', '.join(Generos)
+
+            usuario_obj.save()  
+            user.email = email
+            user.save() 
+
         return render(request, 'profile.html')
     else:
         # Si el usuario no está autenticado, redirigir al login
