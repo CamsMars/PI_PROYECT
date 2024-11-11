@@ -3,6 +3,8 @@ import google.generativeai as genai
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from Api.models import *
+from django.contrib.auth.models import User
 
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -13,6 +15,10 @@ def chat(request):
         user_input = request.POST.get("user_input", "")
 
         if user_input:
+            user=request.user
+            Salida3=f"hola soy {user.username} "+user_input
+            #print(Salida3)# de Esta manera se puede cargar el historial a la IA
+
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(user_input)
 
