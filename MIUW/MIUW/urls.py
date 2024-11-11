@@ -18,23 +18,28 @@ from django.contrib import admin
 from django.urls import path
 from MIUWApp import views as MIUWApp_views
 from Api import views as Api_views
-from django.urls import path
-
+from AcountService import views as ACviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MIUWApp_views.home, name='home'),
     path('about/', MIUWApp_views.about, name='chattest'),
+
     path('chat/', MIUWApp_views.chat, name='chat'),
-    path('menu/', MIUWApp_views.menu, name='Menu'),
+    path('profile/',MIUWApp_views.perfil, name='profile'),
+
+    path('signupaccount/', ACviews.signupaccount, name='signupaccount'),
+    path('logout/', ACviews.logoutaccount, name='logoutaccount'),
+    path('login/', ACviews.loginaccount, name='loginaccount'),
+
     path('spotify/login', Api_views.AuthenticationURL.as_view(), name='spotify-login'),
     path('spotify/redirect', Api_views.spotify_redirect, name='spotify-redirect'),
     path('spotify/check-auth', Api_views.CheckAuthentication.as_view(), name='spotify-check-auth'),
     path('spotify/create-playlist', Api_views.CreatePlaylist.as_view(), name='create-playlist'),
     path('spotify/modify-playlist/<str:playlist_id>', Api_views.ModifyPlaylist.as_view(), name='modify-playlist'),
     path('spotify/list-playlists', Api_views.ListPlaylists.as_view(), name='list-playlists'),
-    path('profile/',MIUWApp_views.perfil, name='profile'),
-    path('signupaccount/', MIUWApp_views.signupaccount, name='signupaccount'),
-    path('logout/', MIUWApp_views.LogOUT,name='LogOut'),
-    path('login/', MIUWApp_views.LogIN, name='LogIn'),
+    path('spotify/search-song/', Api_views.SearchSong.as_view(), name='search-song'),
+    path('spotify/add-song-to-playlist/<str:playlist_id>/', Api_views.AddSongToPlaylist.as_view(), name='add-song-to-playlist'),
+    path('spotify/get-access-token', Api_views.get_access_token, name='get-access-token'),
+    path('spotify/play-track', Api_views.play_track, name='play-track'),
 ]

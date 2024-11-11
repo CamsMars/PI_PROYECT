@@ -8,7 +8,7 @@ class Token(models.Model):
     expires_in = models.DateTimeField()
     token_type = models.CharField(max_length=50)
 
-class Usuario(models.Model):
+class usuario(models.Model):
     USR = models.CharField(max_length=150)
     Nombre = models.CharField(unique=False,max_length=25, blank=True)
     Apellido = models.CharField(unique=False, max_length=25, blank=True)
@@ -35,4 +35,3 @@ class MESSAGE(models.Model):
 class PLAYLIST(models.Model):
     ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
     LINK_PLAYLIST=models.CharField(max_length=700, null=True)
-
