@@ -2,14 +2,15 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from requests import get, put
+from requests import get
 from django.http import HttpResponseRedirect
 from .credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 from .extras import *
-import logging
+from django.contrib.auth.decorators import login_required
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
+from .models import SpotifyProfile
 
 
 class AuthenticationURL(APIView):
@@ -19,14 +20,15 @@ class AuthenticationURL(APIView):
         return HttpResponseRedirect(url)
 
 
-def spotify_redirect(request, format = None):
+@login_required
+def spotify_redirect(request, format=None):
     code = request.GET.get('code')
     error = request.GET.get('error')
 
     if error:
-        return error
+        return JsonResponse({'error': error}, status=400)
 
-    response = post('https://accounts.spotify.com/api/token', data={
+    response = requests.post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
         'code': code,
         'redirect_uri': REDIRECT_URI,
@@ -37,16 +39,32 @@ def spotify_redirect(request, format = None):
     access_token = response.get('access_token')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
-    token_type = response.get('token_type')
 
-    authKey = request.session.session_key
-    if not request.session.exists(authKey):
-        request.session.create()
-        authKey = request.session.session_key
+    # Get the Spotify user ID
+    user_response = get(
+        'https://api.spotify.com/v1/me',
+        headers={'Authorization': f'Bearer {access_token}'}
+    )
+    if user_response.status_code != 200:
+        return JsonResponse({'error': 'Failed to retrieve Spotify user information'}, status=400)
 
-    update_or_create_tokens(authKey, access_token, refresh_token, expires_in, token_type)
+    user_data = user_response.json()
+    spotify_id = user_data['id']
 
-    #Create a redirect url for the required response
+    # Check if the Spotify ID is already linked to a different user
+    existing_profile = SpotifyProfile.objects.filter(spotify_id=spotify_id).first()
+    if existing_profile and existing_profile.user != request.user:
+        return JsonResponse({'error': 'This Spotify account is already linked to another user.'}, status=400)
+
+    # Save the Spotify profile if not already linked
+    SpotifyProfile.objects.update_or_create(
+        user=request.user,
+        defaults={'spotify_id': spotify_id}
+    )
+
+    # Continue with your session or token handling
+    update_or_create_tokens(request.session.session_key, access_token, refresh_token, expires_in, response.get('token_type'))
+
     redirect_url = "http://localhost:8000/about/"
     return HttpResponseRedirect(redirect_url)
 
@@ -68,8 +86,6 @@ class CheckAuthentication(APIView):
             #redirect to AuthenticationURL
             redirect_url = "/spotify/login"
             return HttpResponseRedirect(redirect_url)
-
-logger = logging.getLogger(__name__)
 
 
 class CreatePlaylist(APIView):
@@ -148,11 +164,9 @@ class ModifyPlaylist(APIView):
                 return Response({'message': 'Playlist modified successfully'}, status=status.HTTP_200_OK)
             else:
                 # Log and return error response from Spotify
-                logger.error(f"Error modifying playlist: {modify_playlist_response.status_code}, Response: {modify_playlist_response.text}")
                 return Response(modify_playlist_response.json(), status=modify_playlist_response.status_code)
 
         except Exception as e:
-            logger.error(f"Unexpected error occurred: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -250,7 +264,6 @@ def get_access_token(request):
 @csrf_exempt
 def play_track(request):
     if request.method == 'PUT':
-        logger.info('Received request to play track.')
 
         session_id = request.session.session_key
         tokens = get_user_tokens(session_id)
@@ -261,10 +274,7 @@ def play_track(request):
                 data = json.loads(request.body)
                 track_uris = data.get('uris', [])
             except json.JSONDecodeError:
-                logger.error('Invalid JSON received.')
                 return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-            logger.info(f'Track URIs to play: {track_uris}')
 
             # Making a request to Spotify API to play the track
             response = requests.put(
@@ -274,15 +284,11 @@ def play_track(request):
             )
 
             if response.status_code == 204:  # Successful response
-                logger.info('Successfully started playing track.')
                 return JsonResponse({'status': 'Playing track'})
             else:
                 error_response = response.json()
-                logger.error(f'Error from Spotify API: {error_response}')
                 return JsonResponse({'error': error_response}, status=response.status_code)
 
-        logger.warning('No access token found for user.')
         return JsonResponse({'error': 'No access token available'}, status=400)
 
-    logger.error('Invalid request method: %s', request.method)
     return JsonResponse({'error': 'Invalid request'}, status=400)
