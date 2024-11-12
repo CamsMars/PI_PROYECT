@@ -28,10 +28,9 @@ def chat(request):
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(Salida3)
 
-            SUARIO.Hystorial = ', '.join(response)
-            SUARIO.save()
-
             if response and hasattr(response, 'text'):
+                SUARIO.Hystorial = ', '.join(response)
+                SUARIO.save()
                 return JsonResponse({"generated_text": response.text})
             else:
                 return JsonResponse({"error": "No se pudo generar contenido."}, status=500)
