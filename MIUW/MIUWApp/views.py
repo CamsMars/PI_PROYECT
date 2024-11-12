@@ -59,14 +59,14 @@ def chat(request):
             response = model.generate_content(Salida3)
 
             if response and hasattr(response, 'text'):
-                user.Hystorial = response.text
+                response_text = response.text 
+                user.Hystorial = response_text
                 user.save()
-                return JsonResponse({"generated_text": response.text})
+                return JsonResponse({"generated_text": response_text})
             else:
                 return JsonResponse({"error": "No se pudo generar contenido."}, status=500)
         else:
             return JsonResponse({"error": "El input del usuario está vacío."}, status=400)
-
     return render(request, 'chat.html')
 
 
@@ -77,54 +77,56 @@ def home(request):
 def about(request):
     return render(request, 'chattest.html')
 
-
 def perfil(request):
     if request.user.is_authenticated:
+        user = request.user
+        usuario_obj = usuario.objects.get(id=user.id)  
+        
         if request.method == "POST":
-
             name = request.POST.get('name')
             last_name = request.POST.get('last_name')
             email = request.POST.get('email')
-            fav_artists = [request.POST.get(f'fav_artist_{i}') for i in range(10)]
+            fav_artists = [request.POST.get(f'fav_artist_{i}') for i in range(9) if request.POST.get(f'fav_artist_{i}')]  # Lista de artistas
             happy_genre = request.POST.get('happy')
-            SAD_genre = request.POST.get('sad')
-            Calm_genre = request.POST.get('calm')
-            Angry_genre = request.POST.get('angry')
-            Euphoria_genre = request.POST.get('euphoria')
+            sad_genre = request.POST.get('sad')
+            calm_genre = request.POST.get('calm')
+            angry_genre = request.POST.get('angry')
+            euphoria_genre = request.POST.get('euphoria')
             love_genre = request.POST.get('love')
-            Motivation_genre = request.POST.get('motivation')
-            Homesicknes_genre = request.POST.get('homesickness')
-            Melancoly_genre = request.POST.get('melancholy')
-            Frustration_genre = request.POST.get('frustration')
+            motivation_genre = request.POST.get('motivation')
+            homesickness_genre = request.POST.get('homesickness')
+            melancholy_genre = request.POST.get('melancholy')
+            frustration_genre = request.POST.get('frustration')
 
-            #print(f"Form data received: {name}, {last_name}, {email}, {fav_artists}, {happy_genre}, {SAD_genre}, {Calm_genre}, {Angry_genre}, {Euphoria_genre}, {love_genre}, {Motivation_genre}, {Homesicknes_genre}, {Melancoly_genre}, {Frustration_genre}")
-
-            Generos = [happy_genre, SAD_genre, Calm_genre, Angry_genre, Euphoria_genre,
-                       love_genre, Motivation_genre, Homesicknes_genre, Melancoly_genre, Frustration_genre]
-
-            #print(f"Genres list: {Generos}")
-
-        
-            user = request.user
-            
-            usuario_obj = usuario.objects.get(id=user)
+            genres = [happy_genre, sad_genre, calm_genre, angry_genre, euphoria_genre,
+                      love_genre, motivation_genre, homesickness_genre, melancholy_genre, frustration_genre]
 
             
             usuario_obj.Nombre = name
             usuario_obj.Apellido = last_name
             usuario_obj.Email = email
-            
+            usuario_obj.Artistas_FAV = ', '.join(fav_artists)  
+            usuario_obj.MusicalPreference = ', '.join(genres)  
+            usuario_obj.save()
 
             
-            usuario_obj.Artistas_FAV = ', '.join(fav_artists)
-
-            usuario_obj.MusicalPreference = ', '.join(Generos)
-
-            usuario_obj.save()  
             user.email = email
-            user.save() 
+            user.save()
 
-        return render(request, 'profile.html')
+       
+        fav_artists = usuario_obj.Artistas_FAV.split(', ') if isinstance(usuario_obj.Artistas_FAV, str) else usuario_obj.Artistas_FAV
+        genres = usuario_obj.MusicalPreference.split(', ') if isinstance(usuario_obj.MusicalPreference, str) else usuario_obj.MusicalPreference
+
+        context = {
+            'name': usuario_obj.Nombre,
+            'last_name': usuario_obj.Apellido,
+            'email': usuario_obj.Email,
+            'fav_artists': fav_artists,  
+            'genres': genres, 
+        }
+
+        return render(request, 'profile.html', context)
+    
     else:
-        # Si el usuario no está autenticado, redirigir al login
+        
         return redirect('loginaccount')
