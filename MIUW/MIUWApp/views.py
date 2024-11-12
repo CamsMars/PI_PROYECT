@@ -17,11 +17,19 @@ def chat(request):
         if user_input:
 
             user=request.user
-            Salida3=f"hola soy {user.username} "+user_input
+            SUARIO=usuario.objects.get(id=user)
+            artistas_fav = SUARIO.Artistas_FAV  # Cadena con los artistas favoritos
+            generos = SUARIO.MusicalPreference
+            Hystory=SUARIO.Hystorial
+
+            Salida3=f"soy {user.username} Mi historial de artistas favoritos es: {artistas_fav}.Los géneros musicales que más me gustan son: {generos}que estan oredenados segun mis sentimientos: Happy,Sad,Calm,Angry,Euphoria,Love,Motivation,Homesickness,Melancoly,Frustration. entonces:   {user_input}   aqui te añado nuestro historial:  {Hystory}"
             #print(Salida3)# de Esta manera se puede cargar el historial a la IA
 
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content(user_input)
+            response = model.generate_content(Salida3)
+
+            SUARIO.Hystorial = ', '.join(response)
+            SUARIO.save()
 
             if response and hasattr(response, 'text'):
                 return JsonResponse({"generated_text": response.text})
