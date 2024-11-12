@@ -11,37 +11,28 @@ from django.contrib.auth.decorators import login_required
 
 
 def signupaccount(request):
-    user=None
     if request.method == 'GET':
-        return render(request, 'signupaccount.html',
-                    #{'form':UserCreationForm})
-                    {'form':UserCreateForm})
+        return render(request, 'signupaccount.html', {'form': UserCreateForm})
     else:
         if request.POST['password1'] == request.POST['password2']:
+            if User.objects.filter(username=request.POST['username']).exists():
+                return render(request, 'signupaccount.html', {'form': UserCreateForm, 'error': 'Username already taken. Choose a new username.'})
             try:
-                user = User.objects.create_user(request.POST['username'],
-                            password=request.POST['password1'])
+                user = User.objects.create_user(username=request.POST['username'], password=request.POST['password1'])
                 user.save()
-                print(1)
-                n = request.POST['username']
-                print(2,n,user.id)
                 US.objects.create(id=user, USR=user.username)
-                print(3)
-
                 login(request, user)
                 return redirect('home')
-            except IntegrityError:
-                if user is not None:
-                    user.delete()
-                return render(request, 'signupaccount.html',
-                    #{'form':UserCreationForm,
-                    
-                    {'form':UserCreateForm,
-                    'error':'Username already taken. Choose new username.'})
+            except IntegrityError as e:
+                print(f"IntegrityError: {e}")
+                return render(request, 'signupaccount.html', {'form': UserCreateForm, 'error': 'Username already taken. Choose a new username.'})
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                return render(request, 'signupaccount.html', {'form': UserCreateForm, 'error': 'An unexpected error occurred. Please try again.'})
         else:
-            return render(request, 'signupaccount.html',
-                #{'form':UserCreationForm, 'error':'Passwords do not match'})
-                {'form':UserCreateForm, 'error':'Passwords do not match'})
+            print("Passwords do not match.")
+            return render(request, 'signupaccount.html', {'form': UserCreateForm, 'error': 'Passwords do not match'})
+
 
 @login_required
 def logoutaccount(request):
@@ -52,14 +43,14 @@ def logoutaccount(request):
 def loginaccount(request):
     if request.method == 'GET':
         return render(request, 'loginaccount.html',
-                        {'form':AuthenticationForm})
+                      {'form': AuthenticationForm})
     else:
         user = authenticate(request, username=request.POST['username'],
                             password=request.POST['password'])
         if user is None:
-            return render(request,'loginaccount.html',
-            {'form': AuthenticationForm(),
-            'error': 'username and password do not match'})
+            return render(request, 'loginaccount.html',
+                          {'form': AuthenticationForm(),
+                           'error': 'username and password do not match'})
         else:
-            login(request,user)
+            login(request, user)
             return redirect('home')

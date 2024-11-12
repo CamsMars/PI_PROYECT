@@ -1,4 +1,5 @@
 import os
+import re
 import google.generativeai as genai
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -6,32 +7,60 @@ from django.contrib.auth.decorators import login_required
 from Api.models import *
 from django.contrib.auth.models import User
 from Api.Api_utilities import create_playlist, search_song, add_song_to_playlist
+from Api.extras import *
 
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+
+def getUserContext(user):
+    profile = usuario.objects.get(id=user)
+    context = {
+        "username": profile.USR,
+        "name": profile.Nombre,
+        "last_name": profile.Apellido,
+        "email": profile.Email,
+        "fav_artists": profile.Artistas_FAV.split(","),
+        "happy_genre": profile.MusicalPreference.split(",")[0],
+        "SAD_genre": profile.MusicalPreference.split(",")[1],
+        "Calm_genre": profile.MusicalPreference.split(",")[2],
+        "Angry_genre": profile.MusicalPreference.split(",")[3],
+        "Euphoria_genre": profile.MusicalPreference.split(",")[4],
+        "love_genre": profile.MusicalPreference.split(",")[5],
+        "Motivation_genre": profile.MusicalPreference.split(",")[6],
+        "Homesicknes_genre": profile.MusicalPreference.split(",")[7],
+        "Melancoly_genre": profile.MusicalPreference.split(",")[8],
+        "Frustration_genre": profile.MusicalPreference.split(",")[9],
+        "History": profile.Hystorial
+    }
+    return context
 
 def chat(request):
     if request.method == "POST":
         user_input = request.POST.get("user_input", "")
 
         if user_input:
+            user = request.user
+            context = getUserContext(user)
 
-            user=request.user
-            SUARIO=usuario.objects.get(id=user)
-            artistas_fav = SUARIO.Artistas_FAV  # Cadena con los artistas favoritos
-            generos = SUARIO.MusicalPreference
-            Hystory=SUARIO.Hystorial
-
-            Salida3=f"soy {user.username} Mi historial de artistas favoritos es: {artistas_fav}.Los géneros musicales que más me gustan son: {generos}que estan oredenados segun mis sentimientos: Happy,Sad,Calm,Angry,Euphoria,Love,Motivation,Homesickness,Melancoly,Frustration. entonces:   {user_input}   aqui te añado nuestro historial:  {Hystory}"
-            #print(Salida3)# de Esta manera se puede cargar el historial a la IA
+            Salida3 = (
+                f"Información del usuario:\n"
+                f"Usuario: {context['username']}\n"
+                f"Nombre: {context['name']}\n"
+                f"Apellido: {context['last_name']}\n"
+                f"Email: {context['email']}\n"
+                f"Artistas favoritos: {', '.join(context['fav_artists'])}\n"
+                f"Géneros musicales preferidos: {', '.join(context['happy_genre'])}, {', '.join(context['SAD_genre'])}, {', '.join(context['Calm_genre'])}, {', '.join(context['Angry_genre'])}, {', '.join(context['Euphoria_genre'])}, {', '.join(context['love_genre'])}, {', '.join(context['Motivation_genre'])}, {', '.join(context['Homesicknes_genre'])}, {', '.join(context['Melancoly_genre'])}, {', '.join(context['Frustration_genre'])}\n"
+                f"Última interacción: {context['History']}\n"
+                f"Entrada del usuario: {user_input}"
+            )
 
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(Salida3)
 
             if response and hasattr(response, 'text'):
-                SUARIO.Hystorial = ', '.join(response)
-                SUARIO.save()
+                user.Hystorial = response.text
+                user.save()
                 return JsonResponse({"generated_text": response.text})
             else:
                 return JsonResponse({"error": "No se pudo generar contenido."}, status=500)

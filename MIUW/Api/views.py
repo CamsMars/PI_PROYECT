@@ -20,15 +20,14 @@ class AuthenticationURL(APIView):
         return HttpResponseRedirect(url)
 
 
-@login_required
-def spotify_redirect(request, format=None):
+def spotify_redirect(request, format = None):
     code = request.GET.get('code')
     error = request.GET.get('error')
 
     if error:
-        return JsonResponse({'error': error}, status=400)
+        return error
 
-    response = requests.post('https://accounts.spotify.com/api/token', data={
+    response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
         'code': code,
         'redirect_uri': REDIRECT_URI,
@@ -39,32 +38,16 @@ def spotify_redirect(request, format=None):
     access_token = response.get('access_token')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
+    token_type = response.get('token_type')
 
-    # Get the Spotify user ID
-    user_response = get(
-        'https://api.spotify.com/v1/me',
-        headers={'Authorization': f'Bearer {access_token}'}
-    )
-    if user_response.status_code != 200:
-        return JsonResponse({'error': 'Failed to retrieve Spotify user information'}, status=400)
+    authKey = request.session.session_key
+    if not request.session.exists(authKey):
+        request.session.create()
+        authKey = request.session.session_key
 
-    user_data = user_response.json()
-    spotify_id = user_data['id']
+    update_or_create_tokens(authKey, access_token, refresh_token, expires_in, token_type)
 
-    # Check if the Spotify ID is already linked to a different user
-    existing_profile = SpotifyProfile.objects.filter(spotify_id=spotify_id).first()
-    if existing_profile and existing_profile.user != request.user:
-        return JsonResponse({'error': 'This Spotify account is already linked to another user.'}, status=400)
-
-    # Save the Spotify profile if not already linked
-    SpotifyProfile.objects.update_or_create(
-        user=request.user,
-        defaults={'spotify_id': spotify_id}
-    )
-
-    # Continue with your session or token handling
-    update_or_create_tokens(request.session.session_key, access_token, refresh_token, expires_in, response.get('token_type'))
-
+    #Create a redirect url for the required response
     redirect_url = "http://localhost:8000/about/"
     return HttpResponseRedirect(redirect_url)
 

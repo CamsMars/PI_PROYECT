@@ -2,7 +2,7 @@ import requests
 from Api.credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 from Api.models import SpotifyProfile
 
-def create_playlist(access_token, name="My Playlist", description="A new playlist"):
+def create_playlist(access_token, name, description):
     """Create a playlist for the given Spotify user ID."""
     response = requests.post(
         f'https://api.spotify.com/v1/users/me/playlists',

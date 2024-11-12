@@ -16,8 +16,6 @@ class usuario(models.Model):
     Nombre = models.CharField(unique=False, max_length=25, blank=True)
     Apellido = models.CharField(unique=False, max_length=25, blank=True)
     Email = models.EmailField(blank=True)
-    tokenSPFY = models.CharField(unique=True, max_length=700, blank=True)
-    SPFY_plan = models.CharField(max_length=50, blank=True)
     MusicalPreference = models.CharField(unique=False, max_length=700, blank=True)
     Artistas_FAV = models.CharField(unique=False, null=True, max_length=700, blank=True)
     Hystorial = models.CharField(unique=False, max_length=700, blank=True)
@@ -41,8 +39,8 @@ class PLAYLIST(models.Model):
     LINK_PLAYLIST=models.CharField(max_length=700, null=True)
 
 class SpotifyProfile(models.Model):
-    user = models.OneToOneField(usuario, on_delete=models.CASCADE, related_name="spotify_profile")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="spotify_profile")
     spotify_id = models.CharField(max_length=255, unique=True)
 
     def _str_(self):
-        return f"{self.user.USR} - {self.spotify_id}"
+        return f"{self.user.username} - {self.spotify_id}"
