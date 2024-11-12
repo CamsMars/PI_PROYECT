@@ -2,14 +2,15 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from requests import get, put
+from requests import get
 from django.http import HttpResponseRedirect
 from .credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 from .extras import *
-import logging
+from django.contrib.auth.decorators import login_required
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
+from .models import SpotifyProfile
 
 
 class AuthenticationURL(APIView):
@@ -68,8 +69,6 @@ class CheckAuthentication(APIView):
             #redirect to AuthenticationURL
             redirect_url = "/spotify/login"
             return HttpResponseRedirect(redirect_url)
-
-logger = logging.getLogger(__name__)
 
 
 class CreatePlaylist(APIView):
@@ -148,11 +147,9 @@ class ModifyPlaylist(APIView):
                 return Response({'message': 'Playlist modified successfully'}, status=status.HTTP_200_OK)
             else:
                 # Log and return error response from Spotify
-                logger.error(f"Error modifying playlist: {modify_playlist_response.status_code}, Response: {modify_playlist_response.text}")
                 return Response(modify_playlist_response.json(), status=modify_playlist_response.status_code)
 
         except Exception as e:
-            logger.error(f"Unexpected error occurred: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -250,7 +247,6 @@ def get_access_token(request):
 @csrf_exempt
 def play_track(request):
     if request.method == 'PUT':
-        logger.info('Received request to play track.')
 
         session_id = request.session.session_key
         tokens = get_user_tokens(session_id)
@@ -261,10 +257,7 @@ def play_track(request):
                 data = json.loads(request.body)
                 track_uris = data.get('uris', [])
             except json.JSONDecodeError:
-                logger.error('Invalid JSON received.')
                 return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-            logger.info(f'Track URIs to play: {track_uris}')
 
             # Making a request to Spotify API to play the track
             response = requests.put(
@@ -274,15 +267,11 @@ def play_track(request):
             )
 
             if response.status_code == 204:  # Successful response
-                logger.info('Successfully started playing track.')
                 return JsonResponse({'status': 'Playing track'})
             else:
                 error_response = response.json()
-                logger.error(f'Error from Spotify API: {error_response}')
                 return JsonResponse({'error': error_response}, status=response.status_code)
 
-        logger.warning('No access token found for user.')
         return JsonResponse({'error': 'No access token available'}, status=400)
 
-    logger.error('Invalid request method: %s', request.method)
     return JsonResponse({'error': 'Invalid request'}, status=400)
