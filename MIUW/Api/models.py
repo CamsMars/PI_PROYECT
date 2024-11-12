@@ -12,7 +12,7 @@ class Token(models.Model):
 
 class usuario(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    USR = models.CharField(max_length=150, unique=True)
+    USR = models.CharField(max_length=150, unique=False)
     Nombre = models.CharField(unique=False, max_length=25, blank=True)
     Apellido = models.CharField(unique=False, max_length=25, blank=True)
     Email = models.EmailField(blank=True)
