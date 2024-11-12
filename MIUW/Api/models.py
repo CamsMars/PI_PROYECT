@@ -44,5 +44,5 @@ class SpotifyProfile(models.Model):
     user = models.OneToOneField(usuario, on_delete=models.CASCADE, related_name="spotify_profile")
     spotify_id = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.user.USR} - {self.spotify_id}"
