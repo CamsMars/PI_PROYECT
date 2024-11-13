@@ -22,25 +22,8 @@ class usuario(models.Model):
     User_BirthDate = models.DateField(null=True, blank=True)
     UserCreateDate = models.DateTimeField(default=timezone.now, blank=True)
 
-class CHAT(models.Model):
-    ID_CHAT=models.IntegerField(primary_key=True, null=False)
-    Generated_PLYST=models.CharField(max_length=700, null=True)
-    SUGERIDA_PLYST=models.CharField(max_length=700, null=True)
-    CREACION=models.DateField(null=True)
-
-class MESSAGE(models.Model):
-    ID_USER=models.ForeignKey(usuario, on_delete=models.CASCADE, null=True)
-    ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
-    USER_DESCRIP=models.TextField()
-    FECHA=models.DateField()
-
 class PLAYLIST(models.Model):
-    ID_CHAT=models.ForeignKey(CHAT,on_delete=models.CASCADE, null=False)
+    ID_USER=models.ForeignKey(usuario, on_delete=models.CASCADE, null=True)
     LINK_PLAYLIST=models.CharField(max_length=700, null=True)
-
-class SpotifyProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="spotify_profile")
-    spotify_id = models.CharField(max_length=255, unique=True)
-
-    def _str_(self):
-        return f"{self.user.username} - {self.spotify_id}"
+    NOMBRE_PLAYLIST=models.CharField(max_length=700, null=True)
+    ID_PLAYLIST=models.CharField(max_length=700, null=True)

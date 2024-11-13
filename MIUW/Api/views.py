@@ -1,16 +1,16 @@
+import json
+
+import requests
+from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from rest_framework.views import APIView
+from django.views.decorators.csrf import csrf_exempt
+from requests import get
 from rest_framework import status
 from rest_framework.response import Response
-from requests import get
-from django.http import HttpResponseRedirect
-from .credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+from rest_framework.views import APIView
+
+from .credentials import REDIRECT_URI
 from .extras import *
-from django.contrib.auth.decorators import login_required
-import requests
-import json
-from django.views.decorators.csrf import csrf_exempt
-from .models import SpotifyProfile
 
 
 class AuthenticationURL(APIView):

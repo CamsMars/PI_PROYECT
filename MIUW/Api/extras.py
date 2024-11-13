@@ -1,8 +1,10 @@
-from .models import Token
-from django.utils import timezone
 from datetime import timedelta
+
+from django.utils import timezone
 from requests import post
-from .credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+
+from .credentials import CLIENT_ID, CLIENT_SECRET
+from .models import Token
 
 BASE_URL = 'https://api.spotify.com/v1/me/'
 
