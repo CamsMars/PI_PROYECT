@@ -48,7 +48,7 @@ def spotify_redirect(request, format = None):
     update_or_create_tokens(authKey, access_token, refresh_token, expires_in, token_type)
 
     #Create a redirect url for the required response
-    redirect_url = "http://localhost:8000/about/"
+    redirect_url = "http://localhost:8000/chat/"
     return HttpResponseRedirect(redirect_url)
 
 
