@@ -29,13 +29,14 @@
         .btn-custom:hover {
             background-color: #0056b3; /* Cambia el color al pasar el mouse */
         }
+
         body {
             background-color: #0D0D0D;
             font-family: 'Poppins', sans-serif;
             color: #FFFFFF;
             margin: 0;
             padding: 0;
-         }
+        }
 
         .container {
             max-width: 600px;
@@ -44,7 +45,7 @@
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             box-shadow: 0 0 10px #0b010f;
-         }
+        }
 
         header {
             text-align: center;
@@ -57,7 +58,7 @@
 
         .form-group {
             margin-bottom: 15px;
-         }
+        }
 
         label {
             display: block;
@@ -65,27 +66,27 @@
             font-weight: 600;
         }
 
-            input[type="text"],
-            input[type="email"],
-            input[type="password"] {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #0D0D0D;
             border-radius: 4px;
             background-color: #ffffff;
             color: #000000;
-            }
+        }
 
-            input[type="text"]::placeholder,
-            input[type="email"]::placeholder,
-            input[type="password"]::placeholder {
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
             color: #AAAAAA;
-            }
+        }
 
         .preferences {
             display: flex;
             flex-wrap: wrap;
-         }
+        }
 
         .tag {
             background-color: #444;
@@ -95,6 +96,7 @@
             margin: 5px;
             cursor: pointer;
         }
+
         .preferences {
             display: grid;
             grid-template-columns: 1fr 1fr; /* Crea dos columnas de igual tamaño */
@@ -105,36 +107,42 @@
             padding: 10px;
             width: 90%; /* Ajusta el ancho si es necesario */
         }
+
         .emotion-preferences {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px; /* Espacio entre cada grupo de emoción */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* Espacio entre cada grupo de emoción */
         }
 
         .emotion-group {
-        display: flex;
-        flex-direction: column;
-        width: 45%; /* Dos columnas */
+            display: flex;
+            flex-direction: column;
+            width: 45%; /* Dos columnas */
         }
 
         .emotion-group label {
-        font-weight: bold;
-        margin-bottom: 5px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .emotion-group input {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
+        .spotify-btn {
+            background-color: #1ED760;
+            border: none;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static "images/logotipo_morado.png" %}" alt="MIUW Logo" style="height: 40px;">
+                <img src="{% static 'images/logotipo_morado.png' %}" alt="MIUW Logo" style="height: 40px;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -161,78 +169,96 @@
             </div>
         </div>
     </nav>
+
     <div class="container">
         <header>
             <h1>Profile</h1>
         </header>
         <form method="POST" action="{% url 'profile' %}">
             {% csrf_token %}
+            
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                <input type="text" id="name" name="name" value="{{ name }}" placeholder="Enter your name" required>
             </div>
+
             <div class="form-group">
                 <label for="last-name">Last Name</label>
-                <input type="text" id="last-name" name="last_name" placeholder="Enter your last name" required>
+                <input type="text" id="last-name" name="last_name" value="{{ last_name }}" placeholder="Enter your last name" required>
             </div>
+
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <input type="email" id="email" name="email" value="{{ email }}" placeholder="Enter your email" required>
             </div>
+
             <div class="form-group">
-                <label>Top 10 favorite artists</label>
+                <label>Authenticate with Spotify</label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary spotify-btn" type="submit" onclick="authenticateSpotify()">Authenticate</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Top favorite artists</label>
                 <div class="preferences">
-                    {% for i in "0123456789" %}
-                        <input type="text" id="fav-artist-{{ i }}" name="fav_artist_{{ i }}" placeholder="Enter artist name" required>
+                    {% for artist in fav_artists %}
+                        <input type="text" id="fav-artist-{{ forloop.counter }}" name="fav_artist_{{ forloop.counter }}" value="{{ artist }}" placeholder="Enter artist name" required>
                     {% endfor %}
                 </div>
             </div>
+            
+
             <div class="emotion-preferences">
                 <div class="emotion-group">
                     <label for="happy">Emotion: Happy</label>
-                    <input type="text" id="happy" name="happy" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="happy" name="happy" value="{{ genres.0 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="sad">Emotion: Sad</label>
-                    <input type="text" id="sad" name="sad" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="sad" name="sad" value="{{ genres.1 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="calm">Emotion: Calm</label>
-                    <input type="text" id="calm" name="calm" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="calm" name="calm" value="{{ genres.2 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="angry">Emotion: Angry</label>
-                    <input type="text" id="angry" name="angry" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="angry" name="angry" value="{{ genres.3 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="euphoria">Emotion: Euphoria</label>
-                    <input type="text" id="euphoria" name="euphoria" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="euphoria" name="euphoria" value="{{ genres.4 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="love">Emotion: Love</label>
-                    <input type="text" id="love" name="love" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="love" name="love" value="{{ genres.5 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="motivation">Emotion: Motivation</label>
-                    <input type="text" id="motivation" name="motivation" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="motivation" name="motivation" value="{{ genres.6 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="homesickness">Emotion: Homesickness</label>
-                    <input type="text" id="homesickness" name="homesickness" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="homesickness" name="homesickness" value="{{ genres.7 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="melancholy">Emotion: Melancholy</label>
-                    <input type="text" id="melancholy" name="melancholy" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="melancholy" name="melancholy" value="{{ genres.8 }}" placeholder="Genre of music you listen to" required>
                 </div>
                 <div class="emotion-group">
                     <label for="frustration">Emotion: Frustration</label>
-                    <input type="text" id="frustration" name="frustration" placeholder="Genre of music you listen to" required>
+                    <input type="text" id="frustration" name="frustration" value="{{ genres.9 }}" placeholder="Genre of music you listen to" required>
                 </div>
-            </div>          
+            </div>
+            
+
             <div class="button">
                 <button type="submit" class="btn-custom" style="margin-top: 20px;">Save Changes</button>
-            </div>            
+            </div>
         </form>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
