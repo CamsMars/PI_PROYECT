@@ -1,4 +1,4 @@
-*.env/
+/keys.env
 *.pyc/
 /.idea
 __pycache__/
